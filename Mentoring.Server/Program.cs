@@ -21,7 +21,7 @@ namespace Mentoring.Server
 
             app.UseAuthorization();
 
-
+            //TEST?//
             app.MapControllers();
 
             app.MapFallbackToFile("/index.html");
