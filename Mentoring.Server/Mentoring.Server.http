@@ -1,0 +1,6 @@
+@Mentoring.Server_HostAddress = http://localhost:5259
+
+GET {{Mentoring.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
