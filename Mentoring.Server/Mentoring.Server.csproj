@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -13,6 +13,7 @@
     <ProjectReference Include="..\mentoring.client\mentoring.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\Mentoring.Server.DataAcces\Mentoring.Server.DataAcces.csproj" />
   </ItemGroup>
 
   <ItemGroup>
