@@ -1,3 +1,5 @@
+using Mentoring.Server.DataAcces;
+
 namespace Mentoring.Server
 {
     public class Program
@@ -7,6 +9,7 @@ namespace Mentoring.Server
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.RegisterDataAcces();
 
             builder.Services.AddControllers();
 
