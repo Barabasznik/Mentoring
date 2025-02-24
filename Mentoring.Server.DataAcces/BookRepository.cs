@@ -6,10 +6,17 @@ namespace Mentoring.Server.DataAcces
 {
     internal class BookRepository : IBookRepository
     {
+
         public List<Book> GetBooks()
         {
-            return new List<Book>() { new Book() { Title = "wahtever" } };
+            return new List<Book> { new() { Title = "wahtever", Description = "BLABLA BLA BLA BLA", Id = 1} };
 
         }
+
+        public List<Book> GetBooksByID()
+        {
+            return new List<Book> { new() { Id = 2 } };
+        }
+        
     }
 }

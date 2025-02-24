@@ -26,6 +26,13 @@ namespace Mentoring.Server.Controllers
         public IEnumerable<Book> Get()
         {
             return _bookRepository.GetBooks();
+
+        }
+
+        [HttpGet("Id")]
+        public IEnumerable<Book> GetById()
+        {
+            return _bookRepository.GetBooksByID();
         }
 
 
