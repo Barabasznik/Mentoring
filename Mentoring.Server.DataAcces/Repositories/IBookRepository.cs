@@ -5,7 +5,7 @@ namespace Mentoring.Server.DataAcces.Repositories
     public interface IBookRepository
     {
         public List<Book> GetBooks();
-        public List<Book> GetBooksByID();
+        public List<Book> GetBooksById();
 
     }
 

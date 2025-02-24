@@ -32,7 +32,7 @@ namespace Mentoring.Server.Controllers
         [HttpGet("Id")]
         public IEnumerable<Book> GetById()
         {
-            return _bookRepository.GetBooksByID();
+            return _bookRepository.GetBooksById();
         }
 
 

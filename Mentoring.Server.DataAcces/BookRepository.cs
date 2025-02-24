@@ -13,7 +13,7 @@ namespace Mentoring.Server.DataAcces
 
         }
 
-        public List<Book> GetBooksByID()
+        public List<Book> GetBooksById()
         {
             return new List<Book> { new() { Id = 2 } };
         }
