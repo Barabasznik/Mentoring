@@ -4,19 +4,22 @@ using Mentoring.Server.DataAcces.Repositories;
 
 namespace Mentoring.Server.DataAcces
 {
-    internal class BookRepository : IBookRepository
+    public class BookRepository : IBookRepository
     {
-
+        private readonly List<Book> _books = new()
+        {
+            new() { Title = "wahtever", Description = "BLABLA BLA BLA BLA", Id = 1},
+            new() { Title = "wahtever2", Description = "BLABLA BLA BLA BLA222", Id = 2}
+        };
         public List<Book> GetBooks()
         {
-            return new List<Book> { new() { Title = "wahtever", Description = "BLABLA BLA BLA BLA", Id = 1} };
-
+            return _books;
         }
 
-        public List<Book> GetBooksById()
+        public Book GetBooksById(int id)
         {
-            return new List<Book> { new() { Id = 2 } };
+            return _books.FirstOrDefault(book => book.Id == id);
         }
-        
+
     }
 }

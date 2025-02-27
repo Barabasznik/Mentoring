@@ -30,10 +30,16 @@ namespace Mentoring.Server.Controllers
         }
 
         [HttpGet("Id")]
-        public IEnumerable<Book> GetById()
+        public ActionResult<Book> GetById([FromQuery]int id)
         {
-            return _bookRepository.GetBooksById();
+            var book = _bookRepository.GetBooksById(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            return Ok(book);
         }
+        
 
 
         //// GET api/<BooksController>/5
