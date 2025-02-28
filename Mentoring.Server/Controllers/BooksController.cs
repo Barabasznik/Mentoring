@@ -12,6 +12,8 @@ namespace Mentoring.Server.Controllers
     {
         private readonly IBookRepository _bookRepository;
 
+       
+
         public BooksController(IBookRepository bookRepository)
         {
             _bookRepository = bookRepository;
@@ -26,7 +28,6 @@ namespace Mentoring.Server.Controllers
         public IEnumerable<Book> Get()
         {
             return _bookRepository.GetBooks();
-
         }
 
         [HttpGet("Id")]
@@ -39,21 +40,15 @@ namespace Mentoring.Server.Controllers
             }
             return Ok(book);
         }
-        
 
 
-        //// GET api/<BooksController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        //// POST api/<BooksController>
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
+        // POST api/<BooksController>
+        [HttpPost]
+        public IActionResult Post([FromBody] Book book)
+        {
+            var newbook = _bookRepository.AddBook(book);
+            return Ok(newbook);
+        }
 
         //// PUT api/<BooksController>/5
         //[HttpPut("{id}")]

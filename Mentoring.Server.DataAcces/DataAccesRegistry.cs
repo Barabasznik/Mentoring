@@ -1,4 +1,6 @@
-﻿using Mentoring.Server.DataAcces.Repositories;
+﻿using Mentoring.Server.DataAcces.Context;
+using Mentoring.Server.DataAcces.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mentoring.Server.DataAcces
@@ -8,6 +10,7 @@ namespace Mentoring.Server.DataAcces
         public static void RegisterDataAcces(this IServiceCollection services)
         {
             services.AddScoped<IBookRepository, BookRepository>();
+            services.AddDbContext<BooksDbContext>(options => options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Integrated Security=True"));
         }
     }
 }
