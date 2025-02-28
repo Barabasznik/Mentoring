@@ -6,6 +6,7 @@ namespace Mentoring.Server.DataAcces.Repositories
     {
         public List<Book> GetBooks();
         Book GetBooksById(int id);
+        Book AddBook(Book book);
 
     }
 
