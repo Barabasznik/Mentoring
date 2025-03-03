@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Mentoring.Server.DataAcces.Models
+﻿namespace Mentoring.Server.DataAcces.Models
 {
     public class Book
     {
