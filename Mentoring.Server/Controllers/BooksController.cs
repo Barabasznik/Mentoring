@@ -2,7 +2,6 @@
 using Mentoring.Server.DataAcces.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Mentoring.Server.Controllers
 {
@@ -36,19 +35,25 @@ namespace Mentoring.Server.Controllers
             var book = _bookRepository.GetBooksById(id);
             if (book == null)
             {
-                return NotFound();
+                return NotFound(new{message = "Sorry, book not found"});
             }
             return Ok(book);
         }
 
 
-        // POST api/<BooksController>
-        [HttpPost]
-        public IActionResult Post([FromBody] Book book)
-        {
-            var newbook = _bookRepository.AddBook(book);
-            return Ok(newbook);
-        }
+
+        //// GET api/<BooksController>/5
+        //[HttpGet("{id}")]
+        //public string Get(int id)
+        //{
+        //    return "value";
+        //}
+
+        //// POST api/<BooksController>
+        //[HttpPost]
+        //public void Post([FromBody] string value)
+        //{
+        //}
 
         //// PUT api/<BooksController>/5
         //[HttpPut("{id}")]
