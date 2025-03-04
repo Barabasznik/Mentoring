@@ -15,9 +15,27 @@ namespace Mentoring.Server.DataAcces.Context
         { 
             
         }
-        
+
+        public DbSet<Library> Library { get; set; }
         public DbSet<Book> Books { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
 
+            modelBuilder.Entity<Book>()
+                .HasOne(b => b.Library)
+                .WithMany(l => l.Books)
+                .HasForeignKey(b => b.LibraryId);
+            modelBuilder.Entity<Book>()
+                .Property(b => b.Title)
+                .IsRequired()
+                .HasMaxLength(50);
+               
+
+            modelBuilder.Entity<Book>()
+                .Property(b => b.Author)
+                .IsRequired();
+
+        }
     }
 }

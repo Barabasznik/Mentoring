@@ -10,7 +10,10 @@ namespace Mentoring.Server.DataAcces
         public static void RegisterDataAcces(this IServiceCollection services)
         {
             services.AddScoped<IBookRepository, BookRepository>();
-            services.AddDbContext<BooksDbContext>(options => options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Integrated Security=True"));
+            services.AddDbContext<BooksDbContext>(options =>
+                options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=BooksDb;Trusted_Connection=True;"));
+
+
         }
     }
 }
