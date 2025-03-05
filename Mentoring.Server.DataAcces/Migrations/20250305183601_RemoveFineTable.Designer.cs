@@ -4,6 +4,7 @@ using Mentoring.Server.DataAcces.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Mentoring.Server.DataAcces.Migrations
 {
     [DbContext(typeof(BooksDbContext))]
-    partial class BooksDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250305183601_RemoveFineTable")]
+    partial class RemoveFineTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,12 +42,17 @@ namespace Mentoring.Server.DataAcces.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("LibraryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LibraryId");
 
                     b.ToTable("Books");
                 });
@@ -79,6 +87,34 @@ namespace Mentoring.Server.DataAcces.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Borrowings");
+                });
+
+            modelBuilder.Entity("Mentoring.Server.DataAcces.Models.Library", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContactEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsOpen")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Libraries");
                 });
 
             modelBuilder.Entity("Mentoring.Server.DataAcces.Models.Reservation", b =>
@@ -143,6 +179,17 @@ namespace Mentoring.Server.DataAcces.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Mentoring.Server.DataAcces.Models.Book", b =>
+                {
+                    b.HasOne("Mentoring.Server.DataAcces.Models.Library", "Library")
+                        .WithMany("Books")
+                        .HasForeignKey("LibraryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Library");
+                });
+
             modelBuilder.Entity("Mentoring.Server.DataAcces.Models.Borrowing", b =>
                 {
                     b.HasOne("Mentoring.Server.DataAcces.Models.Book", "Book")
@@ -179,6 +226,11 @@ namespace Mentoring.Server.DataAcces.Migrations
                     b.Navigation("Book");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Mentoring.Server.DataAcces.Models.Library", b =>
+                {
+                    b.Navigation("Books");
                 });
 #pragma warning restore 612, 618
         }

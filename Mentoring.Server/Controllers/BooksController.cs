@@ -10,18 +10,10 @@ namespace Mentoring.Server.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookRepository _bookRepository;
-
-       
-
         public BooksController(IBookRepository bookRepository)
         {
             _bookRepository = bookRepository;
         }
-
-
-
-        //GET: api/<BooksController>
-
 
         [HttpGet]
         public IEnumerable<Book> Get()
@@ -40,31 +32,35 @@ namespace Mentoring.Server.Controllers
             return Ok(book);
         }
 
+        [HttpPost]
+        public IActionResult PostBook([FromBody] Book newBook)
+        {
+            if (newBook == null)
+            {
+                return BadRequest(new { message = "Invalid book data" });
+            }
+
+            var createdBook = _bookRepository.AddBook(newBook);
+            return CreatedAtAction(nameof(GetById), new { id = createdBook.Id }, createdBook);
+        }
 
 
-        //// GET api/<BooksController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
+        [HttpPut("{id}")]
+        public IActionResult UpdateBook(int id, [FromBody] Book updatedBook)
+        {
+            var existingBook = _bookRepository.UpdateBook(id, updatedBook);
+            if (existingBook == null)
+            {
+                return NotFound(new { message = "Book not found" });
+            }
 
-        //// POST api/<BooksController>
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
-        //// PUT api/<BooksController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/<BooksController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+            return Ok(existingBook);
+        }
     }
+
+    //// DELETE api/<BooksController>/5
+    //[HttpDelete("{id}")]
+    //public void Delete(int id)
+    //{
+    //}
 }
