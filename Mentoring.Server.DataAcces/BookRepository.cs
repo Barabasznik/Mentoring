@@ -12,11 +12,6 @@ namespace Mentoring.Server.DataAcces
         {
             _context = context;
         }
-        private readonly List<Book> _books = new()
-        {
-            new() { Title = "wahtever", Description = "BLABLA BLA BLA BLA", Id = 1},
-            new() { Title = "wahtever2", Description = "BLABLA BLA BLA BLA222", Id = 2}
-        };
         public List<Book> GetBooks()
         {
             return _context.Books.ToList();
@@ -27,12 +22,30 @@ namespace Mentoring.Server.DataAcces
             return _context.Books.FirstOrDefault(book => book.Id == id);
         }
 
-        public Book AddBook(Book book) 
+        public Book AddBook(Book book)
         {
             _context.Books.Add(book);
-                _context.SaveChanges();
+            _context.SaveChanges();
             return book;
         }
-        
+
+
+        public Book UpdateBook(int id, Book updatedBook)
+        {
+            var existingBook = _context.Books.FirstOrDefault(b => b.Id == id);
+            if (existingBook == null)
+            {
+                return null;
+            }
+
+            existingBook.Title = updatedBook.Title;
+            existingBook.Description = updatedBook.Description;
+            existingBook.Author = updatedBook.Author;
+
+            _context.SaveChanges();
+            return existingBook;
+        }
+
+
     }
 }

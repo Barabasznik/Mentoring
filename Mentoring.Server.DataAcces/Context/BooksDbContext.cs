@@ -1,40 +1,51 @@
-﻿using Mentoring.Server.DataAcces.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Mentoring.Server.DataAcces.Models;
 
 namespace Mentoring.Server.DataAcces.Context
 {
     public class BooksDbContext : DbContext
-
     {
-        public BooksDbContext(DbContextOptions options) : base(options)
-        { 
-            
+        public BooksDbContext(DbContextOptions<BooksDbContext> options) : base(options)
+        {
         }
 
-        public DbSet<Library> Library { get; set; }
         public DbSet<Book> Books { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Borrowing> Borrowings { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
             modelBuilder.Entity<Book>()
-                .HasOne(b => b.Library)
-                .WithMany(l => l.Books)
-                .HasForeignKey(b => b.LibraryId);
-            modelBuilder.Entity<Book>()
                 .Property(b => b.Title)
                 .IsRequired()
-                .HasMaxLength(50);
-               
+                .HasMaxLength(255);
 
             modelBuilder.Entity<Book>()
                 .Property(b => b.Author)
-                .IsRequired();
+                .IsRequired()
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<Borrowing>()
+                .HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId);
+
+            modelBuilder.Entity<Borrowing>()
+                .HasOne(b => b.Book)
+                .WithMany()
+                .HasForeignKey(b => b.BookId);
+
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId);
+
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.Book)
+                .WithMany()
+                .HasForeignKey(r => r.BookId);
 
         }
     }
