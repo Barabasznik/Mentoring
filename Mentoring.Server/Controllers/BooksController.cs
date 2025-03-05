@@ -20,8 +20,7 @@ namespace Mentoring.Server.Controllers
         {
             return _bookRepository.GetBooks();
         }
-
-        [HttpGet("Id")]
+        [HttpGet(("Id"))]
         public ActionResult<Book> GetById([FromQuery]int id)
         {
             var book = _bookRepository.GetBooksById(id);
