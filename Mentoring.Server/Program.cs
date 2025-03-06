@@ -9,6 +9,19 @@ namespace Mentoring.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngular",
+                    policy => policy.WithOrigins("https://localhost:54813") // ADRES FRONTENDU!
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+            });
+
+
+
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -16,8 +29,9 @@ namespace Mentoring.Server
             builder.Services.RegisterDataAcces();
             builder.Services.AddControllers();
 
+            
             var app = builder.Build();
-
+            app.UseCors("AllowAngular");
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
