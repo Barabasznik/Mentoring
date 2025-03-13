@@ -16,7 +16,7 @@ function App() {
     
 
     useEffect(() => {
-        fetch("/api/books", {
+        fetch("https://localhost:7051/api/books", {
             headers: {
                 "Content-Type": "application/json; charset=utf-8",
                 "Accept": "application/json"
