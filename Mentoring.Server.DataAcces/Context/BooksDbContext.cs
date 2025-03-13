@@ -47,6 +47,12 @@ namespace Mentoring.Server.DataAcces.Context
                 .WithMany()
                 .HasForeignKey(r => r.BookId);
 
+            //modelBuilder.Entity<Book>(b =>
+            //{
+            //    //b.HasData(new Book() { Id = 1, Name = "English" }, new Book { Id = 2, Name = "French" },
+            //    //    new Book() { Id = 3, Name = "Spanish" });
+            //}
+
         }
     }
 }

@@ -11,7 +11,9 @@ namespace Mentoring.Server.DataAcces
         {
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddDbContext<BooksDbContext>(options =>
-                options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=BooksDb;Integrated Security=True;"));
+
+                options.UseSqlServer(
+                    "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=BooksDb;Integrated Security=True;"));
 
 
         }
