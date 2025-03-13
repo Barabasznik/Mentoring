@@ -1,7 +1,9 @@
 using Mentoring.Server.DataAcces;
+
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+
 
 namespace Mentoring.Server
 {
@@ -10,6 +12,7 @@ namespace Mentoring.Server
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
 
             
             builder.WebHost.ConfigureKestrel(options =>
@@ -34,6 +37,7 @@ namespace Mentoring.Server
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
             builder.Services.RegisterDataAcces();
             builder.Services.AddControllers();
 
@@ -57,6 +61,7 @@ namespace Mentoring.Server
             app.MapControllers();
 
             
+
             app.MapFallbackToFile("/index.html");
 
             app.Run();

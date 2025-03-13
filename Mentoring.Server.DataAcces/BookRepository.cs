@@ -46,6 +46,7 @@ namespace Mentoring.Server.DataAcces
             return existingBook;
         }
 
+
         public int DeleteBook(int id)
         {
             var existingBook = _context.Books.FirstOrDefault(b => b.Id == id);
@@ -59,6 +60,7 @@ namespace Mentoring.Server.DataAcces
             _context.SaveChanges();
             return id;
         }
+
 
     }
 }

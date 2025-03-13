@@ -52,6 +52,7 @@ namespace Mentoring.Server.DataAcces.Context
             //    //b.HasData(new Book() { Id = 1, Name = "English" }, new Book { Id = 2, Name = "French" },
             //    //    new Book() { Id = 3, Name = "Spanish" });
             //}
+
         }
     }
 }

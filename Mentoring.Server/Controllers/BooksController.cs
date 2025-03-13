@@ -22,14 +22,18 @@ namespace Mentoring.Server.Controllers
             return _bookRepository.GetBooks();
         }
 
+
         [HttpGet(("Id"))]
         public ActionResult<Book> GetById([FromQuery] int id)
+
         {
             var book = _bookRepository.GetBooksById(id);
             if (book == null)
             {
+
                 return NotFound(new { message = "Sorry, book not found" });
             }
+
 
             return Ok(book);
         }
@@ -58,6 +62,7 @@ namespace Mentoring.Server.Controllers
 
             return Ok(existingBook);
         }
+
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)

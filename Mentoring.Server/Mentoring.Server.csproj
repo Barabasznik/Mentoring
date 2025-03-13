@@ -10,7 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+
     <ProjectReference Include="..\mentoring.react.client\mentoring.react.client.esproj" />
+
     <ProjectReference Include="..\Mentoring.Server.DataAcces\Mentoring.Server.DataAcces.csproj" />
   </ItemGroup>
 
