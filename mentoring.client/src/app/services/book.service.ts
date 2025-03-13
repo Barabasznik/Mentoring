@@ -13,7 +13,7 @@ export interface Book {
   providedIn: 'root'
 })
 export class BookService {
-  private apiUrl = 'https://localhost:7051/api/books'; // <-- Popraw adres API
+  private apiUrl = 'https://localhost:7051/api/books'; 
 
   constructor(private http: HttpClient) { }
 

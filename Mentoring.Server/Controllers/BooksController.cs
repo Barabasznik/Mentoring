@@ -10,6 +10,7 @@ namespace Mentoring.Server.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookRepository _bookRepository;
+
         public BooksController(IBookRepository bookRepository)
         {
             _bookRepository = bookRepository;
@@ -20,14 +21,16 @@ namespace Mentoring.Server.Controllers
         {
             return _bookRepository.GetBooks();
         }
+
         [HttpGet(("Id"))]
-        public ActionResult<Book> GetById([FromQuery]int id)
+        public ActionResult<Book> GetById([FromQuery] int id)
         {
             var book = _bookRepository.GetBooksById(id);
             if (book == null)
             {
-                return NotFound(new{message = "Sorry, book not found"});
+                return NotFound(new { message = "Sorry, book not found" });
             }
+
             return Ok(book);
         }
 
@@ -55,11 +58,14 @@ namespace Mentoring.Server.Controllers
 
             return Ok(existingBook);
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var deleteBookId = _bookRepository.DeleteBook(id);
+
+            return Ok(deleteBookId);
+        }
     }
 
-    //// DELETE api/<BooksController>/5
-    //[HttpDelete("{id}")]
-    //public void Delete(int id)
-    //{
-    //}
 }

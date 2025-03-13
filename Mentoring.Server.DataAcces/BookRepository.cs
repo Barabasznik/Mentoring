@@ -46,6 +46,19 @@ namespace Mentoring.Server.DataAcces
             return existingBook;
         }
 
+        public int DeleteBook(int id)
+        {
+            var existingBook = _context.Books.FirstOrDefault(b => b.Id == id);
+            if (existingBook == null)
+            {
+                return -1;
+
+            }
+
+            _context.Books.Remove(existingBook);
+            _context.SaveChanges();
+            return id;
+        }
 
     }
 }
