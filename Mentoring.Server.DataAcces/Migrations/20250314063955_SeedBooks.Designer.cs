@@ -4,6 +4,7 @@ using Mentoring.Server.DataAcces.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Mentoring.Server.DataAcces.Migrations
 {
     [DbContext(typeof(BooksDbContext))]
-    partial class BooksDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250314063955_SeedBooks")]
+    partial class SeedBooks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace Mentoring.Server.DataAcces.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Mentoring.Domain.Models.Book", b =>
+            modelBuilder.Entity("Mentoring.Server.DataAcces.Models.Book", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -79,7 +82,7 @@ namespace Mentoring.Server.DataAcces.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Mentoring.Domain.Models.Borrowing", b =>
+            modelBuilder.Entity("Mentoring.Server.DataAcces.Models.Borrowing", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -111,7 +114,7 @@ namespace Mentoring.Server.DataAcces.Migrations
                     b.ToTable("Borrowings");
                 });
 
-            modelBuilder.Entity("Mentoring.Domain.Models.Reservation", b =>
+            modelBuilder.Entity("Mentoring.Server.DataAcces.Models.Reservation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,7 +144,7 @@ namespace Mentoring.Server.DataAcces.Migrations
                     b.ToTable("Reservations");
                 });
 
-            modelBuilder.Entity("Mentoring.Domain.Models.User", b =>
+            modelBuilder.Entity("User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -173,15 +176,15 @@ namespace Mentoring.Server.DataAcces.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Mentoring.Domain.Models.Borrowing", b =>
+            modelBuilder.Entity("Mentoring.Server.DataAcces.Models.Borrowing", b =>
                 {
-                    b.HasOne("Mentoring.Domain.Models.Book", "Book")
+                    b.HasOne("Mentoring.Server.DataAcces.Models.Book", "Book")
                         .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Mentoring.Domain.Models.User", "User")
+                    b.HasOne("User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -192,15 +195,15 @@ namespace Mentoring.Server.DataAcces.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Mentoring.Domain.Models.Reservation", b =>
+            modelBuilder.Entity("Mentoring.Server.DataAcces.Models.Reservation", b =>
                 {
-                    b.HasOne("Mentoring.Domain.Models.Book", "Book")
+                    b.HasOne("Mentoring.Server.DataAcces.Models.Book", "Book")
                         .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Mentoring.Domain.Models.User", "User")
+                    b.HasOne("User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

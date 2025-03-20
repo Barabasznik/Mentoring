@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Mentoring.Server.DataAcces.Models;
+using Mentoring.Domain.Models;
 
 namespace Mentoring.Server.DataAcces.Context
 {
@@ -27,6 +27,13 @@ namespace Mentoring.Server.DataAcces.Context
                 .IsRequired()
                 .HasMaxLength(255);
 
+            modelBuilder.Entity<Book>().HasData(
+                new Book { Id = -1, Title = "Czysty Kod", Description = "Podręcznik dla programistów", Author = "Robert C. Martin" },
+                new Book { Id = -2, Title = "Refaktoryzacja", Description = "Poprawianie struktury kodu", Author = "Martin Fowler" },
+                new Book { Id = -3, Title = "Algorytmy", Description = "Wprowadzenie do algorytmiki", Author = "Thomas H. Cormen" },
+                new Book { Id = -4, Title = "Pragmatyczny Programista", Description = "Droga do mistrzostwa", Author = "Andrew Hunt" }
+            );
+
             modelBuilder.Entity<Borrowing>()
                 .HasOne(b => b.User)
                 .WithMany()
@@ -47,11 +54,7 @@ namespace Mentoring.Server.DataAcces.Context
                 .WithMany()
                 .HasForeignKey(r => r.BookId);
 
-            //modelBuilder.Entity<Book>(b =>
-            //{
-            //    //b.HasData(new Book() { Id = 1, Name = "English" }, new Book { Id = 2, Name = "French" },
-            //    //    new Book() { Id = 3, Name = "Spanish" });
-            //}
+         
 
         }
     }

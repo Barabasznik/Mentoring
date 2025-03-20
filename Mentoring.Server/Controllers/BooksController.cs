@@ -1,7 +1,10 @@
-﻿using Mentoring.Server.DataAcces.Models;
-using Mentoring.Server.DataAcces.Repositories;
+﻿using MediatR;
+using Mentoring.Application.Commands;
+using Mentoring.Application.Interfaces;
+using Mentoring.Application.Queries;
+using Mentoring.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Logging;
 
 namespace Mentoring.Server.Controllers
 {
@@ -9,67 +12,71 @@ namespace Mentoring.Server.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private readonly IBookRepository _bookRepository;
+        private readonly IMediator _mediator;
+        private readonly ILogger<BooksController> _logger;
 
-        public BooksController(IBookRepository bookRepository)
+
+        public BooksController(IMediator mediator)
         {
-            _bookRepository = bookRepository;
+            _mediator = mediator;
         }
 
         [HttpGet]
-        public IEnumerable<Book> Get()
+        public async Task<IEnumerable<Book>> Get()
         {
-            return _bookRepository.GetBooks();
+            var result = await _mediator.Send(new GetBooksQuery());
+            return result;
         }
 
-
         [HttpGet(("Id"))]
-        public ActionResult<Book> GetById([FromQuery] int id)
-
+        public async Task<ActionResult<Book>> GetById([FromQuery] int id)
         {
-            var book = _bookRepository.GetBooksById(id);
-            if (book == null)
+            var result = await _mediator.Send(new GetBookByIdQuery { Id = id });
+            if (result == null)
             {
-
-                return NotFound(new { message = "Sorry, book not found" });
+                return NotFound(new { message = "Książka nie została znaleziona" });
             }
-
-
-            return Ok(book);
+            return Ok(result);
         }
 
         [HttpPost]
-        public IActionResult PostBook([FromBody] Book newBook)
+        public async Task<ActionResult<Book>> PostBook([FromBody] PostBookCommand newBook)
         {
-            if (newBook == null)
-            {
-                return BadRequest(new { message = "Invalid book data" });
-            }
+            var book = await _mediator.Send(newBook);
 
-            var createdBook = _bookRepository.AddBook(newBook);
-            return CreatedAtAction(nameof(GetById), new { id = createdBook.Id }, createdBook);
+            return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
         }
 
 
         [HttpPut("{id}")]
-        public IActionResult UpdateBook(int id, [FromBody] Book updatedBook)
+        public async Task<ActionResult<Book>> UpdateBook(int id, [FromBody] UpdateBookCommand updatedBook)
         {
-            var existingBook = _bookRepository.UpdateBook(id, updatedBook);
-            if (existingBook == null)
+            var result = await _mediator.Send(updatedBook);
+            if (result == null)
             {
                 return NotFound(new { message = "Book not found" });
             }
 
-            return Ok(existingBook);
+            return Ok(result);
         }
 
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var deleteBookId = _bookRepository.DeleteBook(id);
+            try
+            {
+                var command = new DeleteBookCommand { Id = id };
+                await _mediator.Send(command);
+                return Ok();
+            }
+            catch (Exception)
+            {
 
-            return Ok(deleteBookId);
+                return NotFound(new { message = "Książka o podanym ID nie została znaleziona." });
+            }
+
+
         }
     }
 
