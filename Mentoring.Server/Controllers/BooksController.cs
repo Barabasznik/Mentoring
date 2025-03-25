@@ -1,10 +1,9 @@
 ﻿using MediatR;
 using Mentoring.Application.Commands;
-using Mentoring.Application.Interfaces;
 using Mentoring.Application.Queries;
 using Mentoring.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+
 
 namespace Mentoring.Server.Controllers
 {
@@ -13,7 +12,7 @@ namespace Mentoring.Server.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly ILogger<BooksController> _logger;
+    
 
 
         public BooksController(IMediator mediator)

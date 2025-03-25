@@ -1,7 +1,5 @@
-﻿
-using MediatR;
+﻿using MediatR;
 using Mentoring.Application.Interfaces;
-using Mentoring.Domain.Models;
 
 namespace Mentoring.Application.Commands
 {
