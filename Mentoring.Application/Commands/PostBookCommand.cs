@@ -1,24 +1,26 @@
 ﻿using MediatR;
 using Mentoring.Application.Interfaces;
+using Mentoring.Application.Result;
 using Mentoring.Domain.Models;
 
 namespace Mentoring.Application.Commands
 {
-   public class PostBookCommand : IRequest<Book>
+   public class PostBookCommand : IRequest<OperationResult<Book>>
     {
         public string Title { get; set; }
         public string Description { get; set; }
         public string Author { get; set; }
     }
-    public class PostBookCommandHandler : IRequestHandler<PostBookCommand, Book>
+    public class PostBookCommandHandler : IRequestHandler<PostBookCommand, OperationResult<Book>>
     {
         private readonly IBookRepository _bookRepository;
         public PostBookCommandHandler(IBookRepository repository)
         {
             _bookRepository = repository;
         }
-        public async Task<Book> Handle(PostBookCommand post, CancellationToken cancellationToken)
+        public async Task<OperationResult<Book>> Handle(PostBookCommand post, CancellationToken cancellationToken)
         {
+
             var book = new Book()
             {
                 Title = post.Title,
@@ -26,7 +28,7 @@ namespace Mentoring.Application.Commands
                 Author = post.Author
             };
             var createBook = await _bookRepository.AddBookAsync(book);
-            return createBook;
+            return OperationResult<Book>.Success(createBook);
         }
     }
 

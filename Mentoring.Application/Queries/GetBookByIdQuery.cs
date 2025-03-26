@@ -1,24 +1,31 @@
 ﻿using MediatR;
 using Mentoring.Application.Interfaces;
 using Mentoring.Domain.Models;
+using Mentoring.Application.Result;
 
 namespace Mentoring.Application.Queries
 {
-    public class GetBookByIdQuery : IRequest<Book>
+    public class GetBookByIdQuery : IRequest<OperationResult<Book>>
     {
         public int Id { get; set; }
     }
-    public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, Book>
+    public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, OperationResult<Book>>
     {
         private readonly IBookRepository _bookRepository;
-        public GetBookByIdQueryHandler(IBookRepository repository)
+
+        public GetBookByIdQueryHandler(IBookRepository bookRepository)
         {
-            _bookRepository = repository;
+            _bookRepository = bookRepository;
         }
 
-        public async Task<Book> Handle(GetBookByIdQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<Book>> Handle(GetBookByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _bookRepository.GetBooksByIdAsync(request.Id);
+            var book = await _bookRepository.GetBooksByIdAsync(request.Id);
+            if (book == null)
+            {
+                return OperationResult<Book>.Failure("Book not found");
+            }
+            return OperationResult<Book>.Success(book);
         }
     }
 

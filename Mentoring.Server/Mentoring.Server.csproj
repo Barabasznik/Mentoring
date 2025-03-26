@@ -11,6 +11,10 @@
 
   <ItemGroup>
 
+    <ProjectReference Include="..\Mentoring.Application\Mentoring.Application.csproj" />
+
+    <ProjectReference Include="..\Mentoring.Domain\Mentoring.Domain.csproj" />
+
     <ProjectReference Include="..\mentoring.react.client\mentoring.react.client.esproj" />
 
     <ProjectReference Include="..\Mentoring.Server.DataAcces\Mentoring.Server.DataAcces.csproj" />

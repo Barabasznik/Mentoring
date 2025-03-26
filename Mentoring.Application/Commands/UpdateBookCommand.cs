@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using Mentoring.Application.Interfaces;
 using Mentoring.Domain.Models;
+using Mentoring.Application.Result;
 
 namespace Mentoring.Application.Commands
 {
-    public class UpdateBookCommand : IRequest<Book>
+    public class UpdateBookCommand : IRequest<OperationResult<Book>>
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -12,7 +13,7 @@ namespace Mentoring.Application.Commands
         public string Author { get; set; }
     }
 
-    public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, Book>
+    public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, OperationResult<Book>>
     {
         private readonly IBookRepository _bookRepository;
         public UpdateBookCommandHandler(IBookRepository bookRepository)
@@ -20,15 +21,19 @@ namespace Mentoring.Application.Commands
             _bookRepository = bookRepository;
         }
 
-        public async Task<Book> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult<Book>> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
         {
             var existingBook = await _bookRepository.GetBooksByIdAsync(request.Id);
-            if (existingBook == null) { return null; }
+            if (existingBook == null)
+            {
+                return OperationResult<Book>.Failure("Book not found");
+            }
             existingBook.Title = request.Title;
             existingBook.Author = request.Author;
             existingBook.Description = request.Description;
 
-            return await _bookRepository.UpdateBookAsync(request.Id, existingBook);
+            var updatedBook = await _bookRepository.UpdateBookAsync(request.Id, existingBook);
+            return OperationResult<Book>.Success(updatedBook);
         }
     }
 

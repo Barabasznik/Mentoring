@@ -21,21 +21,27 @@ namespace Mentoring.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Book>> Get()
+        public async Task<ActionResult<IEnumerable<Book>>> Get()
         {
             var result = await _mediator.Send(new GetBooksQuery());
-            return result;
+            if (result.IsSuccess)
+            {
+                return Ok(result.Value);
+            }
+
+            return BadRequest(result.Error);
         }
 
         [HttpGet(("Id"))]
         public async Task<ActionResult<Book>> GetById([FromQuery] int id)
         {
             var result = await _mediator.Send(new GetBookByIdQuery { Id = id });
-            if (result == null)
+            if (result.IsSuccess)
             {
-                return NotFound(new { message = "Książka nie została znaleziona" });
+                return Ok(result.Value);
             }
-            return Ok(result);
+
+            return BadRequest(result.Error);
         }
 
         [HttpPost]
@@ -43,7 +49,11 @@ namespace Mentoring.Server.Controllers
         {
             var book = await _mediator.Send(newBook);
 
-            return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
+            if (book.IsSuccess)
+            {
+                return CreatedAtAction(nameof(GetById), new { id = book.Value.Id }, book.Value);
+            }
+            return BadRequest(book.Error);
         }
 
 
@@ -51,30 +61,24 @@ namespace Mentoring.Server.Controllers
         public async Task<ActionResult<Book>> UpdateBook(int id, [FromBody] UpdateBookCommand updatedBook)
         {
             var result = await _mediator.Send(updatedBook);
-            if (result == null)
+            if (result.IsSuccess)
             {
-                return NotFound(new { message = "Book not found" });
+                return Ok(result.Value);
             }
-
-            return Ok(result);
+            return NotFound(result.Error);
         }
 
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            try
-            {
-                var command = new DeleteBookCommand { Id = id };
-                await _mediator.Send(command);
-                return Ok();
-            }
-            catch (Exception)
-            {
 
-                return NotFound(new { message = "Książka o podanym ID nie została znaleziona." });
-            }
-
+            var command = await _mediator.Send(new DeleteBookCommand{ Id = id });
+                if (command.IsSuccess)
+                {
+                    return Ok();
+                }
+                return NotFound(new { message = command.Error });
 
         }
     }
