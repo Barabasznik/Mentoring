@@ -1,5 +1,7 @@
 ﻿import { useEffect, useState } from 'react';
 import './App.css';
+import { AuthenticatedTemplate, MsalProvider, UnauthenticatedTemplate, useMsal } from '@azure/msal-react';
+import { IPublicClientApplication } from "@azure/msal-browser";
 
 interface Book {
     id: number;
@@ -8,12 +10,26 @@ interface Book {
     author: string;
 }
 
-function App() {
+function App({ app }: { app: IPublicClientApplication }) {
     const [books, setBooks] = useState<Book[]>([]);
     const [error, setError] = useState<string | null>(null);
-   
 
-    
+    function SignInButton() {
+        const { instance } = useMsal();
+
+        const handleLogin = () => {
+            instance.loginRedirect({
+                scopes: ["user.read"]
+            });
+
+        };
+        return (
+            <button onClick={handleLogin} style={{ padding: "10px 20px", background: "#0078d4", color: "white" }}>
+                Zaloguj się kontem Microsoft
+            </button>
+        );
+    }
+
 
     useEffect(() => {
         fetch("https://localhost:7051/api/books", {
@@ -22,7 +38,7 @@ function App() {
                 "Accept": "application/json"
             }
         })
-            .then(response => response.text()) 
+            .then(response => response.text())
             .then(text => {
                 console.log("📜 Otrzymany surowy tekst z API:", text);
                 return JSON.parse(text);
@@ -39,21 +55,34 @@ function App() {
     }, []);
 
     return (
-        <div style={{ textAlign: "center", padding: "20px" }}>
-            <h1>Lista Książek</h1> { }
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            {books.length > 0 ? (
-                <ul>
-                    {books.map(book => (
-                        <li key={book.id}>
-                            <strong>{book.title}</strong> - {book.author}
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p>Brak książek do wyświetlenia</p>
-            )}
-        </div>
+        <MsalProvider instance={app}>
+            <AuthenticatedTemplate>
+                <div style={{ textAlign: "center", padding: "20px" }}>
+                    <h1>Lista Książek</h1> { }
+                    {error && <p style={{ color: "red" }}>{error}</p>}
+                    {books.length > 0 ? (
+                        <ul>
+                            {books.map(book => (
+                                <li key={book.id}>
+                                    <strong>{book.title}</strong> - {book.author}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>Brak książek do wyświetlenia</p>
+                    )}
+                </div>
+            </AuthenticatedTemplate>
+
+
+            <UnauthenticatedTemplate>
+                <div>
+                    <h1>Nie jesteś zalogowany</h1>
+                    <SignInButton />
+                </div>
+            </UnauthenticatedTemplate>
+        </MsalProvider>
+
     );
 }
 

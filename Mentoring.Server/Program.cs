@@ -1,9 +1,10 @@
 using Mentoring.Server.DataAcces;
-using System.Reflection;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Mentoring.Application;
+using Mentoring.Server.Middleware;
+using NLog.Web;
+
 
 
 namespace Mentoring.Server
@@ -13,10 +14,13 @@ namespace Mentoring.Server
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            
+            builder.Host.UseNLog();
             builder.WebHost.ConfigureKestrel(options =>
             {
                 options.AllowSynchronousIO = true; 
             });
+            
             builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
             {
                 options.SerializerOptions.PropertyNamingPolicy = null;
@@ -40,9 +44,12 @@ namespace Mentoring.Server
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseCors("AllowAll");
             app.UseDefaultFiles();
             app.UseStaticFiles();
+            
+            app.UseRouting();
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();

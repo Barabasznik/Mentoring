@@ -2,6 +2,7 @@
 using Mentoring.Domain.Models;
 using Mentoring.Server.DataAcces.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 
 namespace Mentoring.Server.DataAcces.Repository
@@ -9,16 +10,20 @@ namespace Mentoring.Server.DataAcces.Repository
     public class BookRepository : IBookRepository
     {
         private readonly BooksDbContext _context;
-        public BookRepository(BooksDbContext context)
+        private readonly ILogger<BookRepository> _logger;
+        public BookRepository(BooksDbContext context, ILogger<BookRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
         public async Task<List<Book>> GetBooksAsync()
         {
+
             return await _context.Books.ToListAsync();
         }
         public async Task<Book> GetBooksByIdAsync(int id)
         {
+            
             return await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
         }
         public async Task<Book> AddBookAsync(Book book)
@@ -29,6 +34,7 @@ namespace Mentoring.Server.DataAcces.Repository
         }
         public async Task<Book> UpdateBookAsync(int id, Book updateBook)
         {
+            
             var existingBook = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
             if (existingBook == null)
             {
@@ -45,6 +51,8 @@ namespace Mentoring.Server.DataAcces.Repository
         }
         public async Task<int> DeleteBookAsync(int id)
         {
+            _logger.LogWarning($"Book with id: {id} DELETE action invoked");
+            _logger.LogError($"Book with id: {id} DELETE action Error");
             var book = await _context.Books.FindAsync(id);
             if (book == null)
             {
