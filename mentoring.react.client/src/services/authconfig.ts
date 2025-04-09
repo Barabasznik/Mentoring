@@ -9,18 +9,17 @@ import {
 
 const msalConfig: Configuration = {
     auth: {
-        clientId: "56b249e4-2c7a-4445-80d9-8a22401a7d3f",
-        authority: "https://eventstorming.b2clogin.com/eventstorming.onmicrosoft.com/B2C_1_SignUpAndSignIn",
-        knownAuthorities: ["eventstorming.b2clogin.com"],
+        clientId: "d237dddb-5618-430f-b117-9d85c9bdd599",  // Twój Client ID z Azure
+        authority: "https://login.microsoftonline.com/e9f3cf59-6853-4d21-aeda-b602198c1ae2",
+        knownAuthorities: ["login.microsoftonline.com"],
     },
     cache: {
-        cacheLocation: BrowserCacheLocation.SessionStorage, // This configures where your cache will be stored
-        storeAuthStateInCookie: false, // Set this to "true" if you are having issues on IE11 or Edge
+        cacheLocation: BrowserCacheLocation.SessionStorage,
+        storeAuthStateInCookie: false,
     },
 };
 
 const msalInstance = new PublicClientApplication(msalConfig);
-
 msalInstance.initialize().then(() => {
     // Default to using the first account if no account is active on page load
     if (!msalInstance.getActiveAccount() && msalInstance.getAllAccounts().length > 0) {
