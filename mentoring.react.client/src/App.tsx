@@ -1,88 +1,108 @@
 ﻿import { useEffect, useState } from 'react';
 import './App.css';
-import { AuthenticatedTemplate, MsalProvider, UnauthenticatedTemplate, useMsal } from '@azure/msal-react';
-import { IPublicClientApplication } from "@azure/msal-browser";
+import {
+    AuthenticatedTemplate,
+    UnauthenticatedTemplate,
+    useMsal,
+    MsalProvider
+} from '@azure/msal-react';
+import { IPublicClientApplication, InteractionRequiredAuthError } from '@azure/msal-browser';
+import axios from 'axios';
+import SignInButton from './SignInButton';
 
 interface Book {
     id: number;
     title: string;
-    description: string;
     author: string;
 }
 
-function App({ app }: { app: IPublicClientApplication }) {
+function BookList() {
+    const { instance, accounts } = useMsal();
     const [books, setBooks] = useState<Book[]>([]);
     const [error, setError] = useState<string | null>(null);
 
-    function SignInButton() {
-        const { instance } = useMsal();
-
-        const handleLogin = () => {
-            instance.loginRedirect({
-                scopes: ["user.read"]
-            });
-
-        };
-        return (
-            <button onClick={handleLogin} style={{ padding: "10px 20px", background: "#0078d4", color: "white" }}>
-                Zaloguj się kontem Microsoft
-            </button>
-        );
-    }
-
-
     useEffect(() => {
-        fetch("https://localhost:7051/api/books", {
-            headers: {
-                "Content-Type": "application/json; charset=utf-8",
-                "Accept": "application/json"
+        const fetchBooks = async () => {
+            if (accounts.length === 0) return;
+
+            try {
+                const response = await instance.acquireTokenSilent({
+                    scopes: ["api://11354273-dc58-487d-975c-653135c76928/All.ReadWrite"],
+                    account: accounts[0]
+                });
+
+                const token = response.accessToken;
+
+                const result = await axios.get("https://localhost:7051/api/books", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                setBooks(result.data);
+            } catch (error: any) {
+                if (error instanceof InteractionRequiredAuthError) {
+                    try {
+                        const response = await instance.acquireTokenPopup({
+                            scopes: ["api://11354273-dc58-487d-975c-653135c76928/All.ReadWrite"]
+                        });
+
+                        const token = response.accessToken;
+
+                        const result = await axios.get("https://localhost:7051/api/books", {
+                            headers: {
+                                Authorization: `Bearer ${token}`
+                            }
+                        });
+
+                        setBooks(result.data);
+                    } catch (popupError) {
+                        console.error("Błąd podczas acquireTokenPopup:", popupError);
+                        setError("Nie udało się uzyskać tokenu przez popup.");
+                    }
+                } else {
+                    console.error("Błąd API:", error);
+                    setError("Nie udało się pobrać książek.");
+                }
             }
-        })
-            .then(response => response.text())
-            .then(text => {
-                console.log("📜 Otrzymany surowy tekst z API:", text);
-                return JSON.parse(text);
-            })
-            .then(data => {
-                console.log("📦 Otrzymane dane JSON:", data);
-                setBooks(data);
-            })
-            .catch(error => {
-                console.error("❌ Błąd API:", error.message);
-                setError(error.message);
-            });
+        };
 
-    }, []);
+        fetchBooks();
+    }, [instance, accounts]);
 
+    return (
+        <div style={{ textAlign: "center", padding: "20px" }}>
+            <h1>📚 Lista książek</h1>
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            {books.length > 0 ? (
+                <ul>
+                    {books.map(book => (
+                        <li key={book.id}>
+                            <strong>{book.title}</strong> - {book.author}
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p>Brak książek do wyświetlenia</p>
+            )}
+        </div>
+    );
+}
+
+function App({ app }: { app: IPublicClientApplication }) {
     return (
         <MsalProvider instance={app}>
             <AuthenticatedTemplate>
-                <div style={{ textAlign: "center", padding: "20px" }}>
-                    <h1>Lista Książek</h1> { }
-                    {error && <p style={{ color: "red" }}>{error}</p>}
-                    {books.length > 0 ? (
-                        <ul>
-                            {books.map(book => (
-                                <li key={book.id}>
-                                    <strong>{book.title}</strong> - {book.author}
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>Brak książek do wyświetlenia</p>
-                    )}
-                </div>
+                <BookList />
             </AuthenticatedTemplate>
 
-
             <UnauthenticatedTemplate>
-                <div>
-                    <h1>Nie jesteś zalogowany</h1>
+                <div className="unauthenticated-container">
+                    <h1 className="unauthenticated-title">Nie jesteś zalogowany</h1>
                     <SignInButton />
                 </div>
             </UnauthenticatedTemplate>
         </MsalProvider>
-
     );
 }
 
