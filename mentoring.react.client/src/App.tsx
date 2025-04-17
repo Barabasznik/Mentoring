@@ -1,5 +1,4 @@
 ﻿import { useEffect, useState } from "react";
-import './index.css'
 import { useMsal, AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
 import SignInButton from "./SignInButton";
 import BookForm from "./components/BookForm";

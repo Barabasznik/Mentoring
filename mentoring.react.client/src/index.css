@@ -8,10 +8,9 @@
 
 .app-container {
   max-width: 800px;
-  margin: 4 auto;
-  padding: 40px 60px;
+  margin: 0 auto;
+  padding: 40px 20px;
   text-align: center;
-  color: rgb(119, 33, 33);
 }
 
 h1 {
