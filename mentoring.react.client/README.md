@@ -1,54 +1,99 @@
-# React + TypeScript + Vite
+# 📚 Lista Książek – Aplikacja React + Azure AD
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🧩 Opis projektu
 
-Currently, two official plugins are available:
+Aplikacja umożliwia zalogowanym użytkownikom:
+- przeglądanie listy książek,
+- dodawanie nowych książek,
+- edycję istniejących,
+- usuwanie książek.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Uwierzytelnianie odbywa się przez **Azure AD** przy użyciu biblioteki `@azure/msal-react`. Komunikacja z API zabezpieczona jest tokenem JWT.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🔧 Struktura katalogów
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```
+📁 src
+├── 📁 components
+│   ├── BookForm.tsx
+│   └── BookList.tsx
+├── 📁 services
+│   ├── apiClient.ts
+│   ├── apiServer.ts
+│   └── authconfig.ts
+├── 📁 types
+│   └── Book.ts
+├── App.tsx
+├── SignInButton.tsx
+└── index.tsx
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📦 Technologie
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- **React 18**
+- **TypeScript**
+- **Axios**
+- **MSAL** (Microsoft Authentication Library)
+- **Azure AD**
+
+---
+
+## ✅ Główne komponenty
+
+### `App.tsx`
+Zarządza logiką pobierania danych i stanem aplikacji.
+
+### `BookForm.tsx`
+Formularz dodawania i edytowania książki.
+
+### `BookList.tsx`
+Lista książek z możliwością edycji i usuwania.
+
+---
+
+## 🌐 Serwisy
+
+### `apiClient.ts`
+Axios + interceptor do tokenów.
+
+### `apiServer.ts`
+Abstrakcja dla zapytań HTTP: `getBooks`, `addBook`, `updateBook`, `deleteBook`.
+
+### `authconfig.ts`
+Konfiguracja MSAL i obsługa kont użytkowników.
+
+---
+
+## 🔐 Uwierzytelnianie
+
+Użytkownik loguje się przez Azure AD. Token pozyskiwany jest za pomocą:
+
+- `acquireTokenSilent()`
+- `acquireTokenPopup()` (jeśli potrzebna interakcja)
+
+---
+
+## 📌 Wymagania
+
+- Rejestracja aplikacji w Azure AD
+- Scope `api://{clientId}/All.ReadWrite`
+- Udzielone uprawnienia
+
+---
+
+## 💡 Możliwe rozszerzenia
+
+- Walidacja formularzy (Formik / Yup)
+- Paginacja i filtrowanie
+- Obsługa spinnerów i loadingów
+- Testy jednostkowe
+
+---
+
+## 🧑‍💻 Autorzy
+
+Projekt stworzony w ramach mentoringu.

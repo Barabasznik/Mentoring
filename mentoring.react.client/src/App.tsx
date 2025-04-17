@@ -1,11 +1,11 @@
-﻿import { useState } from 'react';
-import './App.css';
-import axios from 'axios';
-import { useMsal, AuthenticatedTemplate, UnauthenticatedTemplate } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-browser';
-import SignInButton from './SignInButton';
+﻿import { useEffect, useState } from "react";
+import { useMsal, AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
+import SignInButton from "./SignInButton";
+import BookForm from "./components/BookForm";
+import BookList from "./components/BookList";
+import apiServer from "./services/apiServer";
 
-interface Book {
+export interface Book {
     id: number;
     title: string;
     description: string;
@@ -13,67 +13,68 @@ interface Book {
 }
 
 const App = () => {
-    const { instance, accounts } = useMsal();
+    const { accounts } = useMsal();
     const [books, setBooks] = useState<Book[]>([]);
+    const [editingBook, setEditingBook] = useState<Book | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     const fetchBooks = async () => {
-        if (accounts.length === 0) return;
-
-        const request = {
-            scopes: ["api://11354273-dc58-487d-975c-653135c76928/All.ReadWrite"],
-            account: accounts[0],
-        };
-
         try {
-            const response = await instance.acquireTokenSilent(request);
-            const result = await axios.get("https://localhost:7051/api/books", {
-                headers: {
-                    Authorization: `Bearer ${response.accessToken}`,
-                }
-            });
-            setBooks(result.data);
-        } catch (error: any) {
-            console.warn("Silent token error", error);
-
-            // Jeśli potrzebna zgoda → acquireTokenPopup
-            if (error instanceof InteractionRequiredAuthError) {
-                try {
-                    const popupResponse = await instance.acquireTokenPopup(request);
-                    const result = await axios.get("https://localhost:7051/api/books", {
-                        headers: {
-                            Authorization: `Bearer ${popupResponse.accessToken}`,
-                        }
-                    });
-                    setBooks(result.data);
-                } catch (popupError) {
-                    console.error("Błąd podczas acquireTokenPopup:", popupError);
-                    setError("Nie udało się pobrać książek.");
-                }
-            } else {
-                setError("Błąd pobierania tokenu.");
-            }
+            const books = await apiServer.getBooks();
+            setBooks(books);
+        } catch (err) {
+            console.error("Błąd pobierania książek:", err);
+            setError("Nie udało się pobrać książek.");
         }
+    };
+
+    useEffect(() => {
+        if (accounts.length > 0) {
+            fetchBooks();
+        }
+    }, [accounts]);
+
+    const handleAddOrUpdateBook = async (book: Omit<Book, "id"> | Book) => {
+        try {
+            if ("id" in book) {
+                await apiServer.updateBook(book.id, book);
+            } else {
+                await apiServer.addBook(book);
+            }
+            setEditingBook(null);
+            fetchBooks();
+        } catch (err) {
+            console.error("Błąd zapisu książki:", err);
+            setError("Nie udało się zapisać książki.");
+        }
+    };
+
+    const handleDelete = async (id: number) => {
+        try {
+            await apiServer.deleteBook(id);
+            fetchBooks();
+        } catch (err) {
+            console.error("Błąd usuwania książki:", err);
+            setError("Nie udało się usunąć książki.");
+        }
+    };
+
+    const handleEdit = (book: Book) => {
+        setEditingBook(book);
+    };
+
+    const handleCancelEdit = () => {
+        setEditingBook(null);
     };
 
     return (
         <>
             <AuthenticatedTemplate>
-                <div style={{ textAlign: "center", padding: "20px" }}>
+                <div className="app-container">
                     <h1>📚 Lista Książek</h1>
-                    <button onClick={fetchBooks}>Załaduj książki</button>
                     {error && <p style={{ color: "red" }}>{error}</p>}
-                    {books.length > 0 ? (
-                        <ul>
-                            {books.map((book) => (
-                                <li key={book.id}>
-                                    <strong>{book.title}</strong> - {book.author}
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>Brak książek do wyświetlenia</p>
-                    )}
+                    <BookForm onSubmit={handleAddOrUpdateBook} initialBook={editingBook} cancelEdit={handleCancelEdit} />
+                    <BookList books={books} onEdit={handleEdit} onDelete={handleDelete} />
                 </div>
             </AuthenticatedTemplate>
 
