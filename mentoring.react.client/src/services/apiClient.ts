@@ -2,7 +2,7 @@ import axios from "axios";
 import { msalInstance } from "./authconfig";
 
 const apiClient = axios.create({
-    baseURL: "https://localhost:7051/api", // 🔁 Zmień, jeśli Twój backend działa pod innym adresem
+    baseURL: "https://localhost:7051", 
 });
 
 apiClient.interceptors.request.use(async (config) => {
