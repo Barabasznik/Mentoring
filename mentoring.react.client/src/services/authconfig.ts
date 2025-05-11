@@ -9,8 +9,9 @@ import {
 
 const msalConfig: Configuration = {
     auth: {
-        clientId: "d237dddb-5618-430f-b117-9d85c9bdd599",
-        authority: "https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad",
+        clientId: "c8e5e41f-17b3-44c6-b4c3-111dbab4a267", // ← ZAKTUALIZUJ TUTAJ NA NOWY
+        authority: "https://login.microsoftonline.com/e9f3cf59-6853-4d21-aeda-b602198c1ae2",
+        redirectUri: "/",
         knownAuthorities: ["login.microsoftonline.com"],
     },
     cache: {

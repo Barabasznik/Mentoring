@@ -2,8 +2,8 @@ import { Book } from "../App";
 
 interface Props {
     books: Book[];
-    onEdit: (book: Book) => void;
-    onDelete: (id: number) => void;
+    onEdit?: (book: Book) => void;
+    onDelete?: (id: number) => void;
 }
 
 const BookList = ({ books, onEdit, onDelete }: Props) => {
@@ -19,10 +19,15 @@ const BookList = ({ books, onEdit, onDelete }: Props) => {
                         <strong>{book.title}</strong> – {book.author}
                         <p>{book.description}</p>
                     </div>
-                    <div className="book-actions">
-                        <button onClick={() => onEdit(book)}>Edytuj</button>
-                        <button onClick={() => onDelete(book.id)}>Usuń</button>
-                    </div>
+
+                    {(onEdit || onDelete) && (
+                        <div className="book-actions">
+                            {onEdit && <button onClick={() => onEdit(book)}>Edytuj</button>}
+                            {onDelete && <button onClick={() => onDelete(book.id)}>Usuń</button>}
+                        </div>
+                    )}
+
+
                 </li>
             ))}
         </ul>

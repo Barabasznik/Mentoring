@@ -2,6 +2,7 @@
 using Mentoring.Application;
 using Mentoring.Server.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
 using System.Text.Encodings.Web;
@@ -18,13 +19,13 @@ namespace Mentoring.Server
             // Logger
             builder.Host.UseNLog();
 
-            // Kestrel do obsługi synchronizacji
+            // Kestrel – obsługa synchronizacji
             builder.WebHost.ConfigureKestrel(options =>
             {
                 options.AllowSynchronousIO = true;
             });
 
-            // JSON + polskie znaki
+            // JSON – polskie znaki
             builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
             {
                 options.SerializerOptions.PropertyNamingPolicy = null;
@@ -40,19 +41,28 @@ namespace Mentoring.Server
                           .AllowAnyHeader());
             });
 
-            // JWT Bearer – Azure AD
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.Authority = "https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad";
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateAudience = true,
-                        ValidAudience = "api://d237dddb-5618-430f-b117-9d85c9bdd599"
-                    };
-                });
+            // 🔐 Konfiguracja Azure AD B2C
+            var azureAdSection = builder.Configuration.GetSection("AzureAdB2C");
 
-            // Serwisy
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApi(options =>
+                    {
+                        azureAdSection.Bind(options);
+
+                        options.TokenValidationParameters.NameClaimType = "emails";
+
+                        // Authority i ValidIssuer z konfiguracji
+                        var tenantId = azureAdSection["TenantId"];
+                        options.Authority = $"https://login.microsoftonline.com/{tenantId}";
+                        options.TokenValidationParameters.ValidIssuer = options.Authority;
+
+                        // 👇 ValidAudience z appsettings.json
+                        options.TokenValidationParameters.ValidAudience = azureAdSection["ValidAudience"];
+                    },
+                    options => azureAdSection.Bind(options));
+
+
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddApplication();
@@ -68,7 +78,6 @@ namespace Mentoring.Server
             }
 
             app.UseMiddleware<ErrorHandlingMiddleware>();
-
             app.UseCors("AllowAll");
 
             app.UseDefaultFiles();
@@ -78,12 +87,10 @@ namespace Mentoring.Server
 
             app.UseHttpsRedirection();
 
-            // 🔐 Autoryzacja i autentykacja
-            app.UseAuthentication();
-            app.UseAuthorization();
+            app.UseAuthentication(); // 🔐
+            app.UseAuthorization();  // 🔐
 
             app.MapControllers();
-
             app.MapFallbackToFile("/index.html");
 
             app.Run();

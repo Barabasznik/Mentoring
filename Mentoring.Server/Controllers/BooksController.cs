@@ -2,12 +2,14 @@
 using Mentoring.Application.Commands;
 using Mentoring.Application.Queries;
 using Mentoring.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace Mentoring.Server.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize()]
     [ApiController]
     public class BooksController : ControllerBase
     {

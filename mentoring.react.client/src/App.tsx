@@ -4,6 +4,9 @@ import SignInButton from "./SignInButton";
 import BookForm from "./components/BookForm";
 import BookList from "./components/BookList";
 import apiServer from "./services/apiServer";
+import RoleGuard from "./components/RoleGuard";
+import { Role } from "./types/Role";
+import SignOutButton from "./SignOutButton";
 
 export interface Book {
     id: number;
@@ -71,10 +74,31 @@ const App = () => {
         <>
             <AuthenticatedTemplate>
                 <div className="app-container">
+                    <SignOutButton />
                     <h1>📚 Lista Książek</h1>
                     {error && <p style={{ color: "red" }}>{error}</p>}
-                    <BookForm onSubmit={handleAddOrUpdateBook} initialBook={editingBook} cancelEdit={handleCancelEdit} />
-                    <BookList books={books} onEdit={handleEdit} onDelete={handleDelete} />
+
+                    <RoleGuard allowedRoles={[Role.Admin]}>
+                        <BookForm
+                            onSubmit={handleAddOrUpdateBook}
+                            initialBook={editingBook}
+                            cancelEdit={handleCancelEdit}
+                        />
+                        <BookList books={books} onEdit={handleEdit} onDelete={handleDelete} />
+                    </RoleGuard>
+                    <RoleGuard allowedRoles={[Role.Librarian]}>
+                        <BookForm
+                            onSubmit={handleAddOrUpdateBook}
+                            initialBook={editingBook}
+                            cancelEdit={handleCancelEdit}
+                        />
+                        BIBLIOTEKARZZZZZZZZ
+                        <BookList books={books} onEdit={handleEdit} onDelete={handleDelete} />
+                    </RoleGuard>
+                    <RoleGuard allowedRoles={[Role.Member]}>
+
+                        <BookList books={books} />
+                    </RoleGuard>
                 </div>
             </AuthenticatedTemplate>
 

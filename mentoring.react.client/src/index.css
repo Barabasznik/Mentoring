@@ -7,6 +7,7 @@
 }
 
 .app-container {
+  position: relative;
   max-width: 800px;
   margin: 0 auto;
   padding: 40px 20px;
@@ -111,4 +112,20 @@ li {
 
 .unauthenticated-container button:hover {
   border-color: #646cff;
+}
+
+.logout-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #1a1a1a;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: #333;
 }
