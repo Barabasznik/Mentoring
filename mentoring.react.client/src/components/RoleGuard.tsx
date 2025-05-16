@@ -8,11 +8,14 @@ interface RoleGuardProps {
 }
 
 const RoleGuard = ({ allowedRoles, children }: RoleGuardProps) => {
-  const roles = useRole();
+  const { roles, isLoaded } = useRole();
+
+  if (!isLoaded) return null;
 
   const hasAccess = roles.some(role => allowedRoles.includes(role));
-  console.log(roles)
-  return <>{hasAccess && children}</>;
+  console.log("Rola użytkownika:", roles);
+
+  return <>{hasAccess ? children : null}</>;
 };
 
 export default RoleGuard;

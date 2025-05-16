@@ -1,4 +1,4 @@
-import { Book } from "../App";
+import { Book } from "../types/Book";
 
 interface Props {
     books: Book[];

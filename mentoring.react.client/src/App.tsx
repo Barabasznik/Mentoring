@@ -1,114 +1,83 @@
-﻿import { useEffect, useState } from "react";
-import { useMsal, AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
-import SignInButton from "./SignInButton";
-import BookForm from "./components/BookForm";
-import BookList from "./components/BookList";
-import apiServer from "./services/apiServer";
-import RoleGuard from "./components/RoleGuard";
+﻿import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { AuthenticatedTemplate, UnauthenticatedTemplate, useIsAuthenticated } from "@azure/msal-react";
+import { useEffect } from "react";
+import AdminPage from "./pages/AdminPage";
+import LibrarianPage from "./pages/LibrarianPage";
+import MemberPage from "./pages/MemberPage";
+import FirstPageLogin from "./pages/FirstPageLogin";
+import { useRole } from "./hooks/useRole";
 import { Role } from "./types/Role";
-import SignOutButton from "./SignOutButton";
+import PrivateRoute from "./components/PrivateRoute";
 
-export interface Book {
-    id: number;
-    title: string;
-    description: string;
-    author: string;
-}
-
-const App = () => {
-    const { accounts } = useMsal();
-    const [books, setBooks] = useState<Book[]>([]);
-    const [editingBook, setEditingBook] = useState<Book | null>(null);
-    const [error, setError] = useState<string | null>(null);
-
-    const fetchBooks = async () => {
-        try {
-            const books = await apiServer.getBooks();
-            setBooks(books);
-        } catch (err) {
-            console.error("Błąd pobierania książek:", err);
-            setError("Nie udało się pobrać książek.");
-        }
-    };
+const AppRoutes = () => {
+    const { roles, isLoaded } = useRole();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const isAuthenticated = useIsAuthenticated();
 
     useEffect(() => {
-        if (accounts.length > 0) {
-            fetchBooks();
+        if (!isLoaded || !isAuthenticated) return;
+
+
+        if (location.pathname === "/" || location.pathname === "/member" || location.pathname === "/admin" || location.pathname === "/librarian") {
+            if (roles.includes(Role.Admin)) navigate("/admin", { replace: true });
+            else if (roles.includes(Role.Librarian)) navigate("/librarian", { replace: true });
+            else if (roles.includes(Role.Member)) navigate("/member", { replace: true });
         }
-    }, [accounts]);
+    }, [roles, isLoaded, isAuthenticated, navigate, location.pathname]);
 
-    const handleAddOrUpdateBook = async (book: Omit<Book, "id"> | Book) => {
-        try {
-            if ("id" in book) {
-                await apiServer.updateBook(book.id, book);
-            } else {
-                await apiServer.addBook(book);
-            }
-            setEditingBook(null);
-            fetchBooks();
-        } catch (err) {
-            console.error("Błąd zapisu książki:", err);
-            setError("Nie udało się zapisać książki.");
-        }
-    };
-
-    const handleDelete = async (id: number) => {
-        try {
-            await apiServer.deleteBook(id);
-            fetchBooks();
-        } catch (err) {
-            console.error("Błąd usuwania książki:", err);
-            setError("Nie udało się usunąć książki.");
-        }
-    };
-
-    const handleEdit = (book: Book) => {
-        setEditingBook(book);
-    };
-
-    const handleCancelEdit = () => {
-        setEditingBook(null);
+    const getDefaultRedirect = () => {
+        if (!isLoaded) return <p style={{ textAlign: "center" }}>🔄 Ładowanie ról...</p>;
+        if (roles.includes(Role.Admin)) return <Navigate to="/admin" />;
+        if (roles.includes(Role.Librarian)) return <Navigate to="/librarian" />;
+        if (roles.includes(Role.Member)) return <Navigate to="/member" />;
+        return <p> Brak przypisanej roli.</p>;
     };
 
     return (
-        <>
+        <Routes>
+            <Route path="/" element={getDefaultRedirect()} />
+            <Route
+                path="/admin"
+                element={
+                    <PrivateRoute allowedRoles={[Role.Admin]}>
+                        <AdminPage />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/librarian"
+                element={
+                    <PrivateRoute allowedRoles={[Role.Librarian]}>
+                        <LibrarianPage />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/member"
+                element={
+                    <PrivateRoute allowedRoles={[Role.Member]}>
+                        <MemberPage />
+                    </PrivateRoute>
+                }
+            />
+        </Routes>
+    );
+};
+
+const App = () => {
+    return (
+        <Router>
             <AuthenticatedTemplate>
-                <div className="app-container">
-                    <SignOutButton />
-                    <h1>📚 Lista Książek</h1>
-                    {error && <p style={{ color: "red" }}>{error}</p>}
-
-                    <RoleGuard allowedRoles={[Role.Admin]}>
-                        <BookForm
-                            onSubmit={handleAddOrUpdateBook}
-                            initialBook={editingBook}
-                            cancelEdit={handleCancelEdit}
-                        />
-                        <BookList books={books} onEdit={handleEdit} onDelete={handleDelete} />
-                    </RoleGuard>
-                    <RoleGuard allowedRoles={[Role.Librarian]}>
-                        <BookForm
-                            onSubmit={handleAddOrUpdateBook}
-                            initialBook={editingBook}
-                            cancelEdit={handleCancelEdit}
-                        />
-                        BIBLIOTEKARZZZZZZZZ
-                        <BookList books={books} onEdit={handleEdit} onDelete={handleDelete} />
-                    </RoleGuard>
-                    <RoleGuard allowedRoles={[Role.Member]}>
-
-                        <BookList books={books} />
-                    </RoleGuard>
-                </div>
+                <AppRoutes />
             </AuthenticatedTemplate>
 
             <UnauthenticatedTemplate>
-                <div className="unauthenticated-container">
-                    <h1>Nie jesteś zalogowany</h1>
-                    <SignInButton />
-                </div>
+                <Routes>
+                    <Route path="*" element={<FirstPageLogin />} />
+                </Routes>
             </UnauthenticatedTemplate>
-        </>
+        </Router>
     );
 };
 
