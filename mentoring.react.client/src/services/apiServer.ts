@@ -1,5 +1,5 @@
 import axios from "./apiClient";
-import { Book } from "../App";
+import { Book } from "../types/Book";
 
 const getBooks = async (): Promise<Book[]> => {
     const response = await axios.get("/api/books");

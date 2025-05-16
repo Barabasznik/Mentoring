@@ -18,7 +18,7 @@ const PrivateRoute = ({ children, allowedRoles }: Props) => {
     }
 
     if (!isLoaded) {
-        return <p style={{ textAlign: "center" }}>🔄 Ładowanie uprawnień...</p>;
+        return <p style={{ textAlign: "center" }}>Ładowanie uprawnień...</p>;
     }
 
     const hasAccess = allowedRoles
@@ -26,7 +26,7 @@ const PrivateRoute = ({ children, allowedRoles }: Props) => {
         : true;
 
     if (!hasAccess) {
-        return <p style={{ color: "red", textAlign: "center" }}>🚫 Brak dostępu</p>;
+        return <p style={{ color: "red", textAlign: "center" }}> Brak dostępu</p>;
     }
 
     return <>{children}</>;
